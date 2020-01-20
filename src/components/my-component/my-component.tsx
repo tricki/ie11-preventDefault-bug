@@ -1,5 +1,4 @@
-import { Component, Prop, h } from '@stencil/core';
-import { format } from '../../utils/utils';
+import { Component, h, EventEmitter, Element, Event, Listen } from '@stencil/core';
 
 @Component({
   tag: 'my-component',
@@ -7,26 +6,25 @@ import { format } from '../../utils/utils';
   shadow: true
 })
 export class MyComponent {
-  /**
-   * The first name
-   */
-  @Prop() first: string;
 
-  /**
-   * The middle name
-   */
-  @Prop() middle: string;
+  @Element() el: HTMLMyComponentElement;
 
-  /**
-   * The last name
-   */
-  @Prop() last: string;
+  @Event() testEvent: EventEmitter;
 
-  private getText(): string {
-    return format(this.first, this.middle, this.last);
+  @Listen('testEvent')
+  testEventListener(e: CustomEvent) {
+    console.log(`Listener: Before preventDefault(): Default prevented: `, e.defaultPrevented);
+    e.preventDefault();
+    console.log(`Listener: After preventDefault(): Default prevented: `, e.defaultPrevented);
+  }
+
+  emitEvent() {
+    const event = this.testEvent.emit();
+
+    console.log(`Emitter: Default prevented:`, event.defaultPrevented);
   }
 
   render() {
-    return <div>Hello, World! I'm {this.getText()}</div>;
+    return <button onClick={() => this.emitEvent()}>Fire Test Event</button>;
   }
 }
